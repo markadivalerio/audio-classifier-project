@@ -1,4 +1,6 @@
 *
 !audio-classifier-project.ipynb
+!filter_audioset_data.ipynb
+!scripts/*
 !.gitignore
 !*.placeholder
