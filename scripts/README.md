@@ -23,7 +23,7 @@ http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_ind
 ## Download wav files
 
 ```bash
-cat balanced_train_segments-edited.csv | ./../scripts/download.sh
+cat balanced_train_segments-animals.csv | ./../scripts/download.sh
 
-cat eval_segmentes-edited.csv | ./../scripts/download.sh
+cat eval_segmentes-animals.csv | ./../scripts/download.sh
 ```
