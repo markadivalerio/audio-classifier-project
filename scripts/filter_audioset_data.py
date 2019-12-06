@@ -15,8 +15,8 @@ def strip_quotes(in_string):
 
 def main():
     # Labels and supporting data
-    audioset_labels = pd.read_csv("data/class_labels_indices.csv")
-    qa_true_count = pd.read_csv("data/qa_true_counts.csv")
+    audioset_labels = pd.read_csv("class_labels_indices.csv")
+    qa_true_count = pd.read_csv("qa_true_counts.csv")
     original_labels = audioset_labels.copy()
 
     def get_display_name_from_mid(mid):
@@ -28,8 +28,8 @@ def main():
     
     # Training and Eval data
     # audioset_unbal_train_df = pd.read_csv("data/audioset/unbalanced_train_segments.csv")
-    audioset_bal_train = pd.read_csv("data/balanced_train_segments-edited.csv")#, delimiter=', ', engine='python')
-    audioset_eval = pd.read_csv("data/eval_segments-edited.csv")#, delimiter=', ', engine='python')
+    audioset_bal_train = pd.read_csv("balanced_train_segments-edited.csv")#, delimiter=', ', engine='python')
+    audioset_eval = pd.read_csv("eval_segments-edited.csv")#, delimiter=', ', engine='python')
 
     train_cols = list(audioset_bal_train.columns.values)[3:]
     # print(train_cols)
@@ -181,12 +181,12 @@ def main():
 
     # Save filtered data frames
     print("\nSaving new filtered animal-only data frames....")
-    print('data/balanced_train_segments-animals.csv')
-    print('data/eval_segments-animals.csv')
-    print('data/class_labels_indices-animals.csv')
-    audioset_bal_train.to_csv('data/balanced_train_segments-animals.csv', header=True, index=False)
-    audioset_eval.to_csv('data/eval_segments-animals.csv', header=True, index=False)
-    audioset_labels.to_csv('data/class_labels_indices-animals.csv', header=True, index=False)
+    print('../data/balanced_train_segments-animals.csv')
+    print('../data/eval_segments-animals.csv')
+    print('../data/class_labels_indices-animals.csv')
+    audioset_bal_train.to_csv('../data/audioset/balanced_train_segments-animals.csv', header=True, index=False)
+    audioset_eval.to_csv('../data/audioset/eval_segments-animals.csv', header=True, index=False)
+    audioset_labels.to_csv('../data/audioset/class_labels_indices-animals.csv', header=True, index=False)
 
     return (audioset_bal_train, audioset_eval, audioset_labels)
 

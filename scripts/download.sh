@@ -6,7 +6,8 @@ SAMPLE_RATE=22050
 fetch_clip() {
   echo "Fetching $1 ($2 to $3)..."
   outname="$1_$2"
-  if [ -f "${outname}.wav.gz" ]; then
+  if [ -f "${outname}.wav" ]; then
+  #if [ -f "${outname}.wav.gz" ]; then
     echo "Already have it."
     return
   fi
@@ -20,10 +21,10 @@ fetch_clip() {
     yes | ffmpeg -loglevel quiet -i "./$outname.wav" -ar $SAMPLE_RATE \
       -ss "$2" -to "$3" "./${outname}_out.wav"
     mv "./${outname}_out.wav" "./$outname.wav"
-    gzip "./$outname.wav"
-  else
-    # Give the user a chance to Ctrl+C.
-    sleep 1
+    #gzip "./$outname.wav"
+  # else
+  #   # Give the user a chance to Ctrl+C.
+  #   sleep 1
   fi
 }
 
