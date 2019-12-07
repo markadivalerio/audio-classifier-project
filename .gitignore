@@ -1,5 +1,6 @@
 *
 !audio-classifier-project.ipynb
+!audio-preprocessing.ipynb
 !filter_audioset_data.ipynb
 !dataloader.py
 !scripts/*
