@@ -114,6 +114,7 @@ def main():
         #THIS WILL TAKE A WHILE!!!!!
         all_data = []
         all_labels = []
+        all_files = []
         #UltraSound8K
         if load_urbansound:
             print("loading Ultrasound8k")
@@ -136,6 +137,7 @@ def main():
                         all_data.append(features)
                         all_labels.append(label)
                         one_file = fname
+                        all_files.append(fname)
     #                     display_wav(fname)
     #                     break
 
@@ -154,6 +156,7 @@ def main():
                         features = extract_features(fname)
                         all_data.append(features)
                         all_labels.append("bird")
+                        all_files.append(fname)
 
 
         if load_kaggle:
@@ -187,6 +190,7 @@ def main():
                     all_data.append(features)
                     label = 'cat' if file.startswith('cat') else 'dog'
                     all_labels.append(label)
+                    all_files.append(fname)
                     one_file = fname
 
         if load_audioset:
@@ -220,16 +224,17 @@ def main():
 
                         all_data.append(features)
                         all_labels.append(label)
+                        all_files.append(fname)
 
 
-        return np.array(all_data), np.array(all_labels), one_file
+        return np.array(all_data), np.array(all_labels), all_files, one_file
 
-    all_data, all_labels, one_file = load_all_wav_files(load_urbansound_data,
+    all_data, all_labels, all_files, one_file = load_all_wav_files(load_urbansound_data,
                                           load_birds_data,
                                           load_kaggle_data,
                                           load_kaggle_cats_dogs_data,
                                           load_audioset_data)
-    return (all_data, all_labels, one_file)
+    return (all_data, all_labels, all_files, one_file)
 
 if __name__ == "__main__":
     return_object = main()
