@@ -5,6 +5,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
+import re
 import random
 from datetime import datetime
 
@@ -28,26 +29,32 @@ import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
 plt.style.use('ggplot')
 
-
-def main():
+def main(load_urbansound_data=False,
+         load_birds_data=False,
+         load_kaggle_data=False,
+         load_kaggle_cats_dogs_data=False,
+         load_audioset_data=False):
     ####### Setup Environment #######
 
     ####### Configs for Machine Learning #######
     ### Loading Test/Training Data ###
-    load_urbansound_data = False # <-- Note: Urbansound8k has a shortcut for testing/debugging, only loads 1 folder (800 instead of 8000)
+    #load_urbansound_data = False # <-- Note: Urbansound8k has a shortcut for testing/debugging, only loads 1 folder (800 instead of 8000)
     # Data Source: https://urbansounddataset.weebly.com/urbansound8k.html
-    load_birds_data      = False
+    #load_birds_data      = False
     # Data Source: http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads
-    load_kaggle_data     = False
+    #load_kaggle_data     = False
     # Data Source: https://www.kaggle.com/mmoreaux/environmental-sound-classification-50#esc50.csv
-    load_kaggle_cats_dogs_data  = True
+    #load_kaggle_cats_dogs_data  = True
     # Data Source:  https://www.kaggle.com/c/dogs-vs-cats/data
     #               download using link https://www.kaggle.com/c/3362/download-all
-    load_audioset_data   = False
+    #load_audioset_data   = False
     # Data Source: https://research.google.com/audioset/index.html
     # See scripts/README.md for downloading & filtering instructions.
 
+
+
     def extract_features(file_name):
+        return None
         """
         Extracts 193 chromatographic features from sound file. 
         including: MFCC's, Chroma_StFt, Melspectrogram, Spectral Contrast, and Tonnetz
@@ -175,6 +182,8 @@ def main():
                         features = extract_features(fname)
                         all_data.append(features)
                         all_labels.append(label)
+                        all_files.append(fname)
+                        one_file = fname
 
         if load_kaggle_cats_dogs:
             print("Loading Kaggle cats and dogs")
@@ -194,12 +203,16 @@ def main():
                     one_file = fname
 
         if load_audioset:
+            err_files = []
             # Data Source: https://research.google.com/audioset/index.html
             # See scripts/README.md for downloading & filtering instructions.
             print("Loading Audioset")
             metadata_b = pd.read_csv("./data/audioset/balanced_train_segments-animals.csv")
             metadata_e = pd.read_csv("./data/audioset/eval_segments-animals.csv")
             metadata_l = pd.read_csv("./data/audioset/class_labels_indices-animals.csv")
+    #         print("METADATA BALANCED", metadata_b.head())
+    #         print("METADATA EVAL", metadata_e.head())
+    #         print("METADATA LABEL", metadata_l.head())
             for root, dirs, files in os.walk("./data/audioset"):
                 print(root, str(len(dirs)), str(len(files)), len(all_data))
                 for idx, file in enumerate(files):
@@ -207,17 +220,25 @@ def main():
                         if(len(all_data) % 100 == 0):
                             print(str(len(all_data)))
                         fname = os.path.join(root, file)
-                        features = extract_features(fname)
-                        no_ext = file.replace(".wav", "")
+                        try:
+                            features = extract_features(fname)
+                        except ValueError as err:
+                            # Errors out on files that are empty or nearly empty
+                            err_files.append(fname)
+                            continue
+    #                     file_id = file.replace(".wav", "")
+                        fid = re.sub(r'_[\d\.]+wav$','',file)
                         temp = None
                         if "balanced_train_segments" in fname:
-                            temp = metadata_b[metadata_b['# YTID'] == no_ext]["Unnamed: 3"].tolist()
+    #                         temp = metadata_b[metadata_b['# YTID'] == no_ext]["Unnamed: 3"].tolist()
+                            temp = metadata_b[metadata_b['# YTID'] == fid]["Unnamed: 3"].tolist()
                         elif "eval_segments" in fname:
-                            temp = metadata_e[metadata_e['# YTID'] == no_ext]["Unnamed: 3"].tolist()
+    #                         temp = metadata_e[metadata_e['# YTID'] == no_ext]["Unnamed: 3"].tolist()
+                            temp = metadata_e[metadata_e['# YTID'] == fid]["Unnamed: 3"].tolist()
                         if not temp:
                             continue
                         label_code = temp[0]
-                        label_temp = metadata_l[metadata.mid == label_code]["display_name"].to_list()
+                        label_temp = metadata_l[metadata_l.mid == label_code]["display_name"].to_list()
                         if not label_temp:
                             continue
                         label = label_temp[0]
@@ -225,6 +246,10 @@ def main():
                         all_data.append(features)
                         all_labels.append(label)
                         all_files.append(fname)
+                        if(len(all_data) >= 1000):
+                            break
+            if err_files:
+                print("{} ERROR FILES:\n {}".format(len(err_files), err_files))
 
 
         return np.array(all_data), np.array(all_labels), all_files, one_file
