@@ -2,6 +2,8 @@
 !audio-classifier-project.ipynb
 !audio-preprocessing.ipynb
 !filter_audioset_data.ipynb
+!kaggle-comp-cats_vs_dogs_binary_classifier.ipynb
+!urbansounds8k_classifier.ipynb
 !dataloader.py
 !scripts/*
 !.gitignore

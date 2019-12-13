@@ -32,7 +32,9 @@ plt.style.use('ggplot')
 def main(load_urbansound_data=False,
          load_birds_data=False,
          load_kaggle_data=False,
+         load_kaggle_all_data=False,
          load_kaggle_cats_dogs_data=False,
+         load_freesound_data=False,
          load_audioset_data=False):
     ####### Setup Environment #######
 
@@ -109,7 +111,9 @@ def main(load_urbansound_data=False,
     def load_all_wav_files(load_urbansound=False,
                            load_birds=False,
                            load_kaggle=False,
+                           load_kaggle_all=False,
                            load_kaggle_cats_dogs=False,
+                           load_freesound=False,
                            load_audioset=False):
         '''
         Returns two numpy array
@@ -131,8 +135,8 @@ def main(load_urbansound_data=False,
                 print(root, str(len(dirs)), str(len(files)), len(all_data))
     #SHORTCUT
     # This is in here for quick tests - only loads first Ultrasound8k folder (instead of all of them)
-                if len(all_data) > 0: 
-                    break
+                # if len(all_data) > 0: 
+                #     break
     #END SHORTCUT
                 for idx, file in enumerate(files):
                     if file.endswith('.wav'):
@@ -166,7 +170,7 @@ def main(load_urbansound_data=False,
                         all_files.append(fname)
 
 
-        if load_kaggle:
+        if load_kaggle or load_kaggle_all:
             print("Loading Kaggle")
             # Data Source: https://www.kaggle.com/mmoreaux/environmental-sound-classification-50#esc50.csv
             metadata = pd.read_csv("./data/environmental-sound-classification-50/esc50.csv")
@@ -176,7 +180,7 @@ def main(load_urbansound_data=False,
                 if file.endswith('.wav'):
                     label = metadata[metadata.filename == file]["category"].tolist()[0]
                     animals=["cat", "chirping_birds","cow","crickets","crow","dog","frog","hen","insects","pig","rooster","sheep"]
-                    if label in animals:
+                    if label in animals or load_kaggle_all:
                         if(len(all_data) % 100 == 0):
                             print(str(len(all_data)))
                         features = extract_features(fname)
@@ -201,6 +205,37 @@ def main(load_urbansound_data=False,
                     all_labels.append(label)
                     all_files.append(fname)
                     one_file = fname
+
+
+        if load_freesound:
+            print("Loading Freesound")
+            # Data Source:  https://www.kaggle.com/c/freesound-audio-tagging/data
+            metadata_train = pd.read_csv('./data/freesound-audio-tagging/train_post_competition.csv')
+            metadata_test  = pd.read_csv('./data/freesound-audio-tagging/test_post_competition.csv')
+            metadata_test = metadata_test[metadata_test.label != 'None']
+            for root, dirs, files in os.walk("./data/freesound-audio-tagging/"):
+                for file in files:
+                    if file.endswith('.wav'):
+                        fname = os.path.join(root, file)
+                        if "audio_train" in fname:
+                            try:
+                                label = metadata_train[metadata_train['fname'] == file]["label"].tolist()[0]
+                            except:
+                                continue
+                        elif "audio_test" in fname:
+                            try:
+                                label = metadata_test[metadata_test['fname'] == file]["label"].tolist()[0]
+                            except:
+                                continue
+                        else:
+                            continue
+
+                        if(len(all_data) % 100 == 0):
+                            print(str(len(all_data)))
+                        features = extract_features(fname)
+                        all_data.append(features)
+                        all_labels.append(label)
+                        all_files.append(fname)
 
         if load_audioset:
             err_files = []
@@ -257,7 +292,9 @@ def main(load_urbansound_data=False,
     all_data, all_labels, all_files, one_file = load_all_wav_files(load_urbansound_data,
                                           load_birds_data,
                                           load_kaggle_data,
+                                          load_kaggle_all_data,
                                           load_kaggle_cats_dogs_data,
+                                          load_freesound_data,
                                           load_audioset_data)
     return (all_data, all_labels, all_files, one_file)
 
